@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login & Registrierung</title>
+<style>
+  body {
+    margin: 0; 
+    font-family: Arial, sans-serif;
+    background-color: black;
+    color: white;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  #container {
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+  }
+  h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 12px 0;
+    border: 1px solid white;
+    border-radius: 4px;
+    background: black;
+    color: white;
+  }
+  input::placeholder {
+    color: #bbb;
+  }
+  button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    text-decoration: underline;
+  }
+  .form-btn {
+    background-color: #222;
+    padding: 8px 0;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  #error {
+    color: #ff4444;
+    margin-bottom: 12px;
+  }
+
+  /* Haus-Seite */
+  #housesPage {
+    display: none;
+    background: black;
+    color: white;
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+  }
+  #housesPage h2 {
+    text-align: center;
+  }
+  .houses-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .house {
+    background: #111;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 10px;
+  }
+  .house img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  .address {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+
+  <div id="registerForm">
+    <h2>Registrieren</h2>
+    <div id="error"></div>
+    <input type="text" id="regUsername" placeholder="Benutzername" />
+    <input type="password" id="regPassword" placeholder="Passwort" />
+    <button class="form-btn" onclick="register()">Registrieren</button>
+    <p>Schon registriert? <button onclick="showLogin()">Einloggen</button></p>
+  </div>
+
+  <div id="loginForm" style="display:none;">
+    <h2>Login</h2>
+    <div id="loginError"></div>
+    <input type="text" id="loginUsername" placeholder="Benutzername" />
+    <input type="password" id="loginPassword" placeholder="Passwort" />
+    <button class="form-btn" onclick="login()">Einloggen</button>
+    <p>Noch keinen Account? <button onclick="showRegister()">Registrieren</button></p>
+  </div>
+
+</div>
+
+<div id="housesPage">
+  <h2>Willkommen! Hier sind einige Häuser:</h2>
+  <div class="houses-container">
+    <div class="house">
+      <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=400&q=80" alt="Haus 1" />
+      <div class="address">Musterstraße 1, 12345 Berlin</div>
+    </div>
+    <div class="house">
+      <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80" alt="Haus 2" />
+      <div class="address">Beispielweg 24, 54321 Hamburg</div>
+    </div>
+    <div class="house">
+      <img src="https://images.unsplash.com/photo-1505692952047-8a295bcab26b?auto=format&fit=crop&w=400&q=80" alt="Haus 3" />
+      <div class="address">Lindenallee 12, 10115 München</div>
+    </div>
+    <div class="house">
+      <img src="https://images.unsplash.com/photo-1501183638714-3c6b8002f3d1?auto=format&fit=crop&w=400&q=80" alt="Haus 4" />
+      <div class="address">Hauptstraße 99, 70173 Stuttgart</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Zeige Register-Form
+  function showRegister() {
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('error').textContent = '';
+  }
+
+  // Zeige Login-Form
+  function showLogin() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginError').textContent = '';
+  }
+
+  // Prüfung auf erlaubte Zeichen (Groß-/Kleinbuchstaben und Zahlen)
+  function isValidInput(text) {
+    return /^[a-zA-Z0-9]+$/.test(text);
+  }
+
+  // Registrierung
+  function register() {
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = '';
+
+    if (!username || !password) {
+      errorDiv.textContent = 'Bitte alle Felder ausfüllen.';
+      return;
+    }
+    if (!isValidInput(username) || !isValidInput(password)) {
+      errorDiv.textContent = 'Nur Groß-/Kleinbuchstaben und Zahlen sind erlaubt.';
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[username]) {
+      errorDiv.textContent = 'Benutzername existiert bereits.';
+      return;
+    }
+
+    users[username] = password;
+    localStorage.setItem('users', JSON.stringify(users));
+    alert('Registrierung erfolgreich! Du kannst dich jetzt einloggen.');
+    showLogin();
+  }
+
+  // Login
+  function login() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const loginErrorDiv = document.getElementById('loginError');
+    loginErrorDiv.textContent = '';
+
+    if (!username || !password) {
+      loginErrorDiv.textContent = 'Bitte alle Felder ausfüllen.';
+      return;
+    }
+    if (!isValidInput(username) || !isValidInput(password)) {
+      loginErrorDiv.textContent = 'Nur Groß-/Kleinbuchstaben und Zahlen sind erlaubt.';
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (!users[username] || users[username] !== password) {
+      loginErrorDiv.textContent = 'Benutzername oder Passwort falsch.';
+      return;
+    }
+
+    // Login erfolgreich: zeige Haus-Seite
+    document.getElementById('container').style.display = 'none';
+    document.getElementById('housesPage').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
